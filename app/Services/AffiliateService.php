@@ -25,8 +25,22 @@ class AffiliateService
      * @param  float $commissionRate
      * @return Affiliate
      */
-    public function register(Merchant $merchant, string $email, string $name, float $commissionRate): Affiliate
-    {
-        // TODO: Complete this method
-    }
+    public function register(Merchant $merchant, string $email, string $name, float $commissionRate, int $discount_code ): Affiliate
+{
+    $commissionRateCents = (int) ($commissionRate * 100);
+    $userId = auth()->id();
+
+    $affiliate = Affiliate::create([
+        'merchant_id' => $merchant->id,
+        'user_id' => $userId,
+        'commission_rate' => $commissionRateCents,
+        'email' => $email,
+        'name' => $name,
+        'discount_code' => $discount_code,  
+    ]);
+
+    return $affiliate;
 }
+
+    }
+

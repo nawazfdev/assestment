@@ -33,6 +33,30 @@ class PayoutOrderJob implements ShouldQueue
      */
     public function handle(ApiService $apiService)
     {
-        // TODO: Complete this method
+      if ($this->order->payout_status !== Order::STATUS_UNPAID) {
+        return;
+      }
+    
+      $affiliate = $this->order->affiliate;
+    
+      $payoutData = [
+        'affiliate_id' => $affiliate->id,
+        'amount' => $this->order->commission_owed,
+      ];
+    
+      try {
+        $apiService->sendPayout($payoutData);
+    
+        $this->order->update(['payout_status' => Order::STATUS_PAID]);
+    
+        PayoutLog::create([
+          'affiliate_id' => $affiliate->id,
+          'order_id' => $this->order->id,
+          'amount' => $this->order->commission_owed,
+        ]);
+      } catch (Exception $e) {
+        Log::error('Payout failed for order ' . $this->order->id . ': ' . $e->getMessage());
+      }
     }
+    
 }

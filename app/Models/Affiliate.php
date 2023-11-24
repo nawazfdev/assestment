@@ -16,6 +16,8 @@ class Affiliate extends Model
     use HasFactory;
 
     protected $fillable = [
+        'email',
+        'name',
         'user_id',
         'merchant_id',
         'commission_rate',
